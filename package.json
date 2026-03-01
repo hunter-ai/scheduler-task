@@ -1,0 +1,13 @@
+{
+  "name": "scheduler-task",
+  "version": "1.0.0",
+  "description": "Cron-based task scheduler that runs prompts via Claude CLI",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

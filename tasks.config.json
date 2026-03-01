@@ -1,0 +1,36 @@
+{
+  "tasks": [
+    {
+      "name": "say-hello",
+      "promptFile": "prompts/say-hello.md",
+      "interval": 15000,
+      "enabled": false,
+      "driver": "claude",
+      "driverConfig": {}
+    },
+    {
+      "name": "data-processor",
+      "promptFile": "prompts/data-processor.md",
+      "interval": 15000,
+      "enabled": false,
+      "driver": "claude",
+      "driverConfig": {},
+      "backoff": {
+        "signal": "NO_DATA",
+        "intervals": [30000, 60000, 120000, 300000]
+      }
+    },
+    {
+      "name": "data-processor-auto-backoff",
+      "promptFile": "prompts/data-processor.md",
+      "interval": 10000,
+      "enabled": true,
+      "driver": "claude",
+      "driverConfig": {},
+      "backoff": {
+        "signal": "NO_DATA",
+        "maxInterval": 1800000
+      }
+    }
+  ]
+}
