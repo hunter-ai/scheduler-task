@@ -34,6 +34,12 @@ class BaseDriver {
         onLine(line);
       }
     });
+    stream.on('end', () => {
+      if (buffer) {
+        onLine(buffer);
+        buffer = '';
+      }
+    });
   }
 }
 

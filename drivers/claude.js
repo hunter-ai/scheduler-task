@@ -37,12 +37,22 @@ class ClaudeDriver extends BaseDriver {
 
       let sessionId = null;
       const outputChunks = [];
+      let outputSize = 0;
+      const OUTPUT_SIZE_LIMIT = 10 * 1024 * 1024; // 10 MB
       let settled = false;
 
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          child.kill('SIGKILL');
+          // Kill the entire process group (negative PID) to reap any child
+          // processes spawned by Claude CLI (e.g. Electron renderer/worker
+          // processes).  plain child.kill() only kills the direct child when
+          // detached:true, leaving the rest as orphans.
+          try {
+            process.kill(-child.pid, 'SIGKILL');
+          } catch {
+            child.kill('SIGKILL'); // fallback if process group is already gone
+          }
           reject(new Error(`Task "${taskName}" timed out after ${this.timeoutMs / 1000}s`));
         }
       }, this.timeoutMs);
@@ -67,7 +77,10 @@ class ClaudeDriver extends BaseDriver {
           const content = msg.message?.content ?? [];
           for (const block of content) {
             if (block.type === 'text') {
-              outputChunks.push(block.text);
+              if (outputSize < OUTPUT_SIZE_LIMIT) {
+                outputChunks.push(block.text);
+                outputSize += block.text.length;
+              }
               process.stdout.write(`[${taskName}] ${block.text}\n`);
             }
           }
